@@ -1,0 +1,86 @@
+/*
+ * 4 Lead Package for Crystal
+ * Based on NDK NX3225SA-26.000000MHZ-B1
+ * NOTE: It is recommended to check the size of the thermal pad for your
+ *       specific device datasheet as it may be different than what is given
+ *       here.
+ */
+
+frame pad {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-padDx/2, -padDy/2)
+    corner2: vec corner1(padDx, padDy)
+    pad "$padNum" corner1 corner2
+}
+
+frame pads {
+    loop xIndex = 0, numPads/2 - 1
+    loop yIndex = 0, 1
+
+    set xOffset = xIndex * dX
+    set yOffset = yIndex * dY
+    set padNum = xIndex * (1-yIndex) + (numPads - xIndex - 1)*yIndex + 1
+    
+    padOffset: vec @(xOffset, yOffset)
+    frame pad padOffset
+}
+
+frame interPadOutline {
+    loop xIndex = 0, numPads/2 - 2
+    loop yIndex = 0, 1
+
+    set p1x = pad1X + xIndex*dX + silkOffsetFromPad
+    set p1y = -outlineL/2 + yIndex*outlineL
+    set p2x = pad1X + (xIndex + 1)*dX - silkOffsetFromPad
+    set p2y = p1y
+    
+    p1: vec @(p1x, p1y)
+    p2: vec @(p2x, p2y)
+    line p1 p2 silkW
+}
+
+frame edgeOutline {
+    table
+        {p1x, p1y, p2x, p2y}
+        {outlineW/2, outlineL/2, outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, -outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, pad1X - silkOffsetFromPad, outlineL/2}
+        {-outlineW/2, -outlineL/2, pad1X - silkOffsetFromPad, -outlineL/2}
+        {outlineW/2, outlineL/2, lastPadX + silkOffsetFromPad, outlineL/2}
+        {outlineW/2, -outlineL/2, lastPadX + silkOffsetFromPad, -outlineL/2}
+        
+    p1: vec @(p1x, p1y)
+    p2: vec @(p2x, p2y)
+    line p1 p2 silkW  
+}
+
+frame outline {
+    set silkOffsetFromPad = padDx/2 + silkSpace + silkW/2
+    set pad1X = -(numPads/2 - 1)/2*dX
+    set lastPadX = pad1X + (numPads/2 - 1) * dX
+    frame interPadOutline @ 
+    frame edgeOutline @
+}
+
+package "SOJ_${numPads}${variant}"
+
+table
+  {padDx, padDy, dX, dY, outlineW, outlineL, silkSpace, silkW, numPads, variant}
+  {1.3mm, 1.9mm, 5.5mm, 3.2mm, 8mm, 3.8mm, 8mil, 10mil, 4, "_5p5mm"}
+
+frame pads @
+
+center: vec @((numPads/2 - 1)/2*dX, dY/2)
+frame outline center
+
+/*Pad location measurements*/
+measx pad.corner2 -> pad.corner1
+measy pad.corner2 -> pad.corner1
+
+/*Pad size measurements*/
+measx pad.corner1 -> pad.corner2
+measy pad.corner1 -> pad.corner2
+
+/*Outline measurements*/
+measy edgeOutline.p1 -> edgeOutline.p2
+measx edgeOutline.p1 >> edgeOutline.p1

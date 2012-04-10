@@ -1,0 +1,89 @@
+/*
+ * PIN_ARRAY footprints for standard 0.1" footprints
+ * (ie. Headers, sockets, breadboard, etc.)
+ */
+
+frame roundPin {
+    orig: vec @(0mm, 0mm)
+    padCorner1: vec @(-padR/2, -padR/2)
+    padCorner2: vec padCorner1(padR, padR)
+    rpad "$pinNum" padCorner1 padCorner2
+    
+    holeCorner1: vec @(-holeR/2, -holeR/2)
+    holeCorner2: vec holeCorner1(holeR, holeR)
+    hole holeCorner1 holeCorner2   
+}
+
+frame squarePin {
+    orig: vec @(0mm, 0mm)
+    padCorner1: vec @(-padR/2, -padR/2)
+    padCorner2: vec padCorner1(padR, padR)
+    pad "1" padCorner1 padCorner2
+    
+    holeCorner1: vec @(-holeR/2, -holeR/2)
+    holeCorner2: vec holeCorner1(holeR, holeR)
+    hole holeCorner1 holeCorner2   
+}
+
+frame padArray {
+    loop n = 0, arrayNumPins - 1
+    
+    set px = n*dX
+    set py = 0mm
+    
+    pinOffset: vec @(px, py)
+    set pinNum = pinNumOffset + n + 1
+    frame roundPin pinOffset
+}
+
+frame otherPins {
+    loop row = 1, numRows - 1
+    set arrayNumPins = numCols
+    
+    arrayOffset: vec @(0mil, row*dY)
+    set pinNumOffset = row*numCols
+    frame padArray arrayOffset
+}
+      
+frame pins {
+    orig: vec @(0mil, 0mil)
+    frame squarePin orig
+    pin2orig: vec @(dX, 0mil)
+    set pinNumOffset = 1
+    set arrayNumPins = numCols -1
+    frame padArray pin2orig
+    
+    frame otherPins @
+}
+
+frame outline {
+    corner1: vec @(-outlineL/2, outlineW/2)
+    corner2: vec @(outlineL/2, -outlineW/2)
+    rect corner1 corner2 silkW
+}
+
+package "PIN_ARRAY_${numRows}x${numCols}${variant}"
+unit mil
+
+table
+  {numRows, numCols, dX, dY, padR, holeR, outlineW, outlineL, silkW, variant}
+  {1, 10, 100mil, 100mil, 60mil, 40mil, 100mil*numRows, numCols*dX, 10mil, ""}
+  {1, 8, 100mil, 100mil, 60mil, 40mil, 100mil*numRows, numCols*dX, 10mil, ""}
+  {1, 6, 100mil, 100mil, 60mil, 40mil, 100mil*numRows, numCols*dX, 10mil, ""}
+
+frame pins @
+
+center: vec @(dX * (numCols - 1)/2, dY * (numRows - 1) / 2)
+frame outline center
+
+/*Pad location measurements*/
+measx squarePin.orig -> roundPin.orig
+measy squarePin.orig -> roundPin.orig
+measx roundPin.orig -> roundPin.orig
+measy roundPin.orig -> roundPin.orig
+
+/*Pad size measurements*/
+// measx pin.padCorner1 -> pin.padCorner2
+// measy pin.padCorner1 -> pin.padCorner2
+// measx pin.holeCorner1 -> pin.holeCorner2
+// measy pin.holeCorner1 -> pin.holeCorner2

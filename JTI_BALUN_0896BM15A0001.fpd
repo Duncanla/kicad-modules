@@ -1,0 +1,61 @@
+/*
+ * 4 Lead Package for Crystal
+ * Based on NDK NX3225SA-26.000000MHZ-B1
+ * NOTE: It is recommended to check the size of the thermal pad for your
+ *       specific device datasheet as it may be different than what is given
+ *       here.
+ */
+
+frame pad {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-padDx/2, -padDy/2)
+    corner2: vec corner1(padDx, padDy)
+    pad "$padNum" corner1 corner2
+}
+
+frame pads {
+    table
+      {xOffset, yOffset, padNum}
+      {0mm, 0mm, 1}
+      {dX, 0mm, 6}
+      {0mm, -dY, 2}
+      {dX, -dY, 5}
+      {0mm, -2*dY, 3}
+      {dX, -2*dY, 4}
+
+      
+      padOffset: vec @(xOffset, yOffset)
+      frame pad padOffset
+}
+
+frame outline {
+    table
+      {p1x, p1y, p2x, p2y}
+      //{-dX/2 - padDx/2 - silkW/2 - silkSpace, dY + padDy/2 + silkW/2 + silkSpace, dX/2,  dY + padDy/2 + silkW/2 + silkSpace}
+      //{-dX/2 - padDx/2 - silkW/2 - silkSpace,  dY + padDy/2 + silkW/2 + silkSpace, -dX/2 - padDx/2 - silkW/2 - silkSpace, dY}
+      {-dX/2, dY + padDy/2 + silkW/2 + silkSpace, dX/2,  dY + padDy/2 + silkW/2 + silkSpace}
+      {-dX/2, -outlineL/2, dX/2, -outlineL/2}
+      //{-dX/2 - padDx/2 - silkW/2 - silkSpace, dY + padDy/2 + silkW/2 + silkSpace, dX/2,  dY + padDy/2 + silkW/2 + silkSpace}
+    p1: vec @(p1x, p1y)
+    p2: vec @(p2x, p2y)
+    line p1 p2 silkW
+}
+
+package "JTI_BALUN_0896BM15A0001"
+
+table
+  {padDx, padDy, dX, dY, outlineW, outlineL, silkSpace, silkW}
+  {0.6mm, 0.3mm, 1.25mm, 0.65mm, 1.25mm, 2mm, 5mil, 5mil}
+
+frame pads @
+
+center: vec @(dX/2, -dY)
+frame outline center
+
+/*Pad location measurements*/
+measx pad.orig -> pad.orig
+measy pad.orig -> pad.orig
+
+/*Pad size measurements*/
+measx pad.corner1 -> pad.corner2
+measy pad.corner1 -> pad.corner2

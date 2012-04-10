@@ -1,0 +1,59 @@
+/*
+ * 4 Lead Package for Crystal
+ * Based on NDK NX3225SA-26.000000MHZ-B1
+ * NOTE: It is recommended to check the size of the thermal pad for your
+ *       specific device datasheet as it may be different than what is given
+ *       here.
+ */
+
+frame pad {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-padDx/2, -padDy/2)
+    corner2: vec corner1(padDx, padDy)
+    pad "$padNum" corner1 corner2
+}
+
+frame pads {
+    table
+      {xOffset, yOffset, padNum}
+      {0mm, 0mm, 4}
+      {dX, 0mm, 3}
+      {dX, -dY, 2}
+      {0mm, -dY, 1}
+      
+      padOffset: vec @(xOffset, yOffset)
+      frame pad padOffset
+}
+
+frame outline {
+    table
+      {p1x, p1y, p2x, p2y}
+      {-dX/2 + padDx/2 + silkSpace, outlineL/2, dX/2 - padDx/2 - silkSpace, outlineL/2}
+      {-dX/2 + padDx/2 + silkSpace, -outlineL/2, dX/2 - padDx/2 - silkSpace, -outlineL/2}
+      {-outlineW/2, dY/2 - padDy/2 - silkSpace, -outlineW/2, -dY/2 + padDy/2 + silkSpace}
+      {outlineW/2, dY/2 - padDy/2 - silkSpace, outlineW/2, -dY/2 + padDy/2 + silkSpace}
+      //{-dX/2 - padDx/2 - silkW/2 - silkSpace, -dY/2 - padDy/2 - silkW/2 - silkSpace, -dX/2 - padDx/2 - silkW/2 - silkSpace, -dY/2 + padDy/2}
+      //{-dX/2 - padDx/2 - silkW/2 - silkSpace, -dY/2 - padDy/2 - silkW/2 - silkSpace, -dX/2 + padDx/2, -dY/2 - padDy/2 - silkW/2 - silkSpace}
+    p1: vec @(p1x, p1y)
+    p2: vec @(p2x, p2y)
+    line p1 p2 silkW
+}
+
+package "XTAL_4${variant}"
+
+table
+  {padDx, padDy, dX, dY, outlineW, outlineL, silkSpace, silkW, variant}
+  {1.4mm, 1.2mm, 2.2mm, 1.6mm, 3.2mm, 2.5mm, 8mil, 5mil, "_3p2x2p5"}
+
+frame pads @
+
+center: vec @(dX/2, -dY/2)
+frame outline center
+
+/*Pad location measurements*/
+measx pad.orig -> pad.orig
+measy pad.orig -> pad.orig
+
+/*Pad size measurements*/
+measx pad.corner1 -> pad.corner2
+measy pad.corner1 -> pad.corner2

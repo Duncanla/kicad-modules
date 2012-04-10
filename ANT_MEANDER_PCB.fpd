@@ -1,0 +1,87 @@
+/*
+ * Meandering Monopole Antenna for 915 MHz band.
+ * See: http://www.ti.com/litv/pdf/swra227d
+ * 
+ */
+
+frame segmentL1 {
+    corner1: vec @(-W/2, 0mm)
+    corner2: vec corner1(W, L1)
+    pad "1" corner1 corner2 trace
+}
+
+frame segmentL2 {
+    corner1: vec @(0mm, -W/2)
+    corner2: vec corner1(L2, W)
+    pad " " corner1 corner2 trace
+}
+
+frame segmentL3 {
+    corner1: vec @(-W/2, 0mm)
+    corner2: vec corner1(W, L3)
+    pad " " corner1 corner2 trace
+}
+
+frame segmentL4 {
+    corner1: vec @(0mm, -W/2)
+    corner2: vec corner1(L4, W)
+    pad " " corner1 corner2 trace
+}
+
+frame segmentLastL4 {
+    corner1: vec @(0mm, -W/2)
+    corner2: vec corner1(lastL4, W)
+    pad " " corner1 corner2 trace
+}
+
+frame allL3Segments {
+    table
+        {L3offsetX, L3offsetY}
+        {L2, L1}
+        {-L2, L1 + L3 + W}
+        {L2, L1 + 2*L3 + 2*W}
+        
+    L3offset: vec @(L3offsetX, L3offsetY)
+    frame segmentL3 L3offset
+}
+
+frame allL4Segments {
+    table
+        {L4offsetX, L4offsetY}
+        {-L2 - W/2, L1 + L3 + W/2}
+        {-L2 - W/2, L1 + 2*L3 + 3*W/2}
+        
+    L4offset: vec @(L4offsetX, L4offsetY)
+    frame segmentL4 L4offset
+}
+
+frame antenna {
+    frame segmentL1 @
+    
+    L2offset: vec @(W/2, L1-W/2)
+    frame segmentL2 L2offset
+    
+    frame allL3Segments @
+    frame allL4Segments @
+    
+    lastL4Offset: vec @(-L2 - W/2 + (L4 - lastL4), L1 + 3*L3 + 5*W/2)
+    frame segmentLastL4 lastL4Offset
+}
+
+package "ANT_MEANDER_PCB_${freq}"
+allow touch
+
+table
+    {L1, L2, L3, L4, lastL4, W, freq}
+    {9mm, 18mm, 3mm, 38mm, 22mm, 2mm, "915MHZ"}
+    
+frame antenna@
+
+measy segmentL1.corner1 -> segmentL1.corner2
+measx segmentL2.corner1 -> segmentL2.corner2
+measy segmentL3.corner1 -> segmentL3.corner2
+measy segmentLastL4.corner1 -> segmentLastL4.corner2
+measx segmentL4.corner1 -> segmentL4.corner2
+measx segmentLastL4.corner1 -> segmentLastL4.corner2
+    
+    
