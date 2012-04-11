@@ -1,0 +1,122 @@
+/*
+ * Samtec QRM8-026-02.0-L-D-A
+ * 52-pin SMD connector with ground slugs
+ */
+
+frame pad {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-padDx/2, -padDy/2)
+    corner2: vec corner1(padDx, padDy)
+    pad "$padNum" corner1 corner2
+}
+
+frame sigPads {
+    loop xIndex = 0, numPads/2 - 1
+    loop yIndex = 0, 1
+
+    set xOffset = xIndex * dX
+    set yOffset = yIndex * dY
+    set padNum = xIndex * 2 + (1 - yIndex) + 1
+    
+    padOffset: vec @(xOffset, yOffset)
+    frame pad padOffset
+}
+
+frame gndPad {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-gndPadDx/2, -gndPadDy/2)
+    corner2: vec corner1(gndPadDx, gndPadDy)
+    pad "$padNum" corner1 corner2
+}
+
+frame gndPads {
+    loop xIndex = 0, 3
+
+    set xOffset = xIndex * gndDx
+    set padNum = numPads + xIndex + 1;
+    
+    padOffset: vec @(xOffset, 0mm)
+    frame gndPad padOffset
+}
+
+frame pads {
+    frame sigPads @
+    gndPadOffset: vec @(1.6mm, dY/2)
+    frame gndPads gndPadOffset
+}
+
+frame edgeOutline {
+    set chamferOffset = 40mil
+    table
+        {p1x, p1y, p2x, p2y}
+        {outlineW/2, outlineL/2, outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2-chamferOffset, -outlineW/2, -outlineL/2}
+        {-outlineW/2+chamferOffset, outlineL/2, pad1X - silkOffsetFromPad, outlineL/2}
+        {-outlineW/2, -outlineL/2, pad1X - silkOffsetFromPad, -outlineL/2}
+        {outlineW/2, outlineL/2, lastPadX + silkOffsetFromPad, outlineL/2}
+        {outlineW/2, -outlineL/2, lastPadX + silkOffsetFromPad, -outlineL/2}
+	{-outlineW/2, outlineL/2-chamferOffset, -outlineW/2+chamferOffset, outlineL/2}        
+
+    p1: vec @(p1x, p1y)
+    p2: vec @(p2x, p2y)
+    line p1 p2 silkW  
+}
+
+frame outline {
+    set silkOffsetFromPad = padDx/2 + silkSpace + silkW/2
+    set pad1X = -(numPads/2 - 1)/2*dX
+    set lastPadX = pad1X + (numPads/2 - 1) * dX
+    frame edgeOutline @
+}
+
+frame mntHole {
+    center: vec @(0mm, 0mm)
+    corner1: vec center(-1.13mm/2, -1.13mm/2)
+    corner2: vec corner1(1.13mm, 1.13mm)
+    hole corner1 corner2
+}
+
+frame mntHoles {
+    table
+	{holeX, holY}
+	{-23.7mm/2, -0.5mm}
+	{23.7mm/2, -0.5mm}
+
+    holeOffset: vec @(holeX, holY)
+    frame mntHole holeOffset
+}
+
+package "SAMTEC_QRM8-026-02_0-L-D-A"
+
+table
+  {padDx, padDy, dX, dY, gndPadDx, gndPadDy, gndDx, outlineW, outlineL, silkSpace, silkW, numPads}
+  {0.5mm, 1.5mm, 0.8mm, 2.85mm, 4.6mm, 0.51mm, 5.6mm, 26.57mm, 4.35mm, 8mil, 10mil, 52 }
+
+frame pads @
+
+center: vec @((numPads/2 - 1)/2*dX, dY/2)
+frame outline center
+frame mntHoles center
+
+/*Pad location measurements*/
+measx pad.orig -> pad.orig
+measy pad.corner1 >> pad.corner2
+measx pad.orig >> pad.orig
+measx gndPad.corner1 -> pad.orig
+measx gndPad.corner1 >> gndPad.corner2
+measx gndPad.corner2 -> gndPad.corner1
+
+measx mntHole.center -> mntHole.center
+measy mntHole.center -> gndPad.orig
+measx mntHole.corner1 -> mntHole.corner2
+
+
+/*Pad size measurements*/
+measx pad.corner1 -> pad.corner2
+measy pad.corner1 -> pad.corner2
+measx gndPad.corner1 -> gndPad.corner2
+measy gndPad.corner1 -> gndPad.corner2
+
+/*Hole location measurements
+
+/*Outline measurements*/

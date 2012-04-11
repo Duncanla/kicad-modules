@@ -1,0 +1,137 @@
+/*
+ * SAMTEC UPT-06-03.0-01-L-V
+ * Samtec power connector
+ */
+
+frame roundPin {
+    orig: vec @(0mm, 0mm)
+    padCorner1: vec @(-padR, -padR)
+    padCorner2: vec padCorner1(2*padR, 2*padR)
+    rpad "$pinNum" padCorner1 padCorner2
+    
+    holeCorner1: vec @(-holeR, -holeR)
+    holeCorner2: vec holeCorner1(2*holeR, 2*holeR)
+    hole holeCorner1 holeCorner2   
+}
+
+frame squarePin {
+    orig: vec @(0mm, 0mm)
+    padCorner1: vec @(-padR, -padR)
+    padCorner2: vec padCorner1(2*padR, 2*padR)
+    pad "$pinNum" padCorner1 padCorner2
+    
+    holeCorner1: vec @(-holeR, -holeR)
+    holeCorner2: vec holeCorner1(2*holeR, 2*holeR)
+    hole holeCorner1 holeCorner2   
+}
+
+frame padArray {
+    loop n = 0, arrayNumPins - 1
+    
+    set px = n*dX
+    set py = 0mm
+    
+    pinOffset: vec @(px, py)
+
+    frame roundPin pinOffset
+}
+
+frame padMatrix {
+    orig: vec @(0mm, 0mm)
+    center: vec @((numCols-1)*dX/2, (numRows-1)*dY/2)
+
+    loop row = 1, numRows
+    set arrayNumPins = numCols
+    
+    arrayOffset: vec @(0mil, (row-1)*dY)
+    set pinNumOffset = row*numCols
+    frame padArray arrayOffset
+}
+      
+frame pins {
+    orig: vec @(0mil, 0mil)
+    loop pinNum = 1, numPins
+    	pinOffset: vec @(pinDx*(pinNum-1), 0mm)
+    	frame padMatrix pinOffset
+}
+
+frame mntHole {
+    center: vec @(0mm, 0mm)
+    corner1: vec center(-1.19mm/2, -1.19mm/2)
+    corner2: vec corner1(1.19mm, 1.19mm)
+    hole corner1 corner2
+}
+
+frame mntHoles {
+    set offsetY = 1.5mm
+    set offsetXabs = (numPins*3.81mm + 8.76mm)/2
+    table
+        {offsetX}
+        {-offsetXabs}
+        {offsetXabs}
+    
+    holeOffset: vec @(offsetX, offsetY)
+    frame mntHole holeOffset
+}
+
+frame outline {
+    set outlineW = numPins*3.8mm + 10.3mm
+    set minorW = numPins*3.8mm + 3.8mm
+    set chamferOffset = 40mil
+
+    minorMeasX1: vec @(minorW/2, -4.5mm)
+    minorMeasX2: vec @(-minorW/2, -4.5mm)
+    
+    minorMeasY1: vec @(outlineW/2, 4.5mm)
+    minorMeasY2: vec @(outlineW/2, -2.5mm)
+
+    table
+        {px1, py1, px2, py2}
+        {-outlineW/2+chamferOffset, 4.5mm, outlineW/2, 9mm/2}
+        {outlineW/2, 4.5mm, outlineW/2, -2.5mm}
+        {outlineW/2, -2.5mm, minorW/2, -2.5mm}
+        {minorW/2, -2.5mm, minorW/2, -4.5mm}
+        {minorW/2, -4.5mm, -minorW/2, -4.5mm}
+        {-minorW/2, -4.5mm, -minorW/2, -2.5mm}
+        {-minorW/2, -2.5mm, -outlineW/2, -2.5mm}
+        {-outlineW/2, -2.5mm, -outlineW/2, 4.5mm-chamferOffset}
+        {-outlineW/2, 4.5mm-chamferOffset, -outlineW/2+chamferOffset, 4.5mm}
+
+    p1: vec @(px1, py1)
+    p2: vec @(px2, py2)
+    line p1 p2 silkW
+      
+}
+
+package "SAMTEC_UPT-${pinVariant}-03_0-01-L-V"
+unit mm
+allow overlap
+
+table
+    {numPins, pinDx, numRows, numCols, dX, dY, padR, holeR, silkW, pinVariant}
+    {6, 3.81mm, 3, 2, 2mm, 1.5mm, 1.17mm/2, 0.64mm/2, 10mil, "06"}
+
+
+center: vec @(dX * (numCols - 1)/2 + (numPins-1)/2*pinDx, dY * (numRows - 1) / 2)
+frame pins @
+frame mntHoles center
+frame outline center
+
+/*Outline measurements*/
+measx outline.p1 >> outline.p2
+measy outline.p1 >> outline.p2
+measx outline.minorMeasX1 -> outline.minorMeasX2
+measy outline.minorMeasY1 -> outline.minorMeasY2
+
+/*Hole location measurements*/
+measx mntHole.center -> mntHole.center
+measy mntHole.center -> center
+
+/*Pad size measurements*/
+measx roundPin.padCorner1 -> roundPin.padCorner2
+measy roundPin.holeCorner1 -> roundPin.holeCorner2
+
+/*Pad Location measurements*/
+measx roundPin.orig -> roundPin.orig
+measy roundPin.orig -> roundPin.orig
+measx padMatrix.orig -> padMatrix.orig
