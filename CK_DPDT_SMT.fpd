@@ -1,0 +1,66 @@
+/*
+ * C&K DPDT Surfact Mount Switch
+ * Part Number: JS202011SCQN
+ */
+
+frame pad {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-padDx/2, -padDy/2)
+    corner2: vec corner1(padDx, padDy)
+    pad "$padNum" corner1 corner2
+}
+
+frame pads {
+    loop xIndex = 0, numPads/2 - 1
+    loop yIndex = 0, 1
+
+    set xOffset = xIndex * dX
+    set yOffset = yIndex * dY
+    set padNum = xIndex * (1-yIndex) + (numPads - xIndex - 1)*yIndex + 1
+    
+    padOffset: vec @(xOffset, yOffset)
+    frame pad padOffset
+}
+
+frame edgeOutline {
+    set shortLength = outlineW/2-(numPads/2-1)/2*dX-padDx/2-10mil
+    table
+        {p1x, p1y, p2x, p2y}
+        {outlineW/2, outlineL/2, outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, -outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, -outlineW/2+shortLength, outlineL/2}
+        {-outlineW/2, -outlineL/2, -outlineW/2+shortLength, -outlineL/2}
+        {outlineW/2, outlineL/2, outlineW/2-shortLength, outlineL/2}
+        {outlineW/2, -outlineL/2, outlineW/2-shortLength, -outlineL/2}
+
+    p1: vec @(p1x, p1y)
+    p2: vec @(p2x, p2y)
+    line p1 p2 silkW  
+}
+
+frame outline {
+    frame edgeOutline @
+}
+
+package "CK_DPDT_SMT${variant}"
+
+table
+  {padDx, padDy, dX, dY, outlineW, outlineL, silkW, numPads, variant}
+  {1.2mm, 2.5mm, 2.5mm, 5.5mm, 9.5mm, 3.5mm, 6mil, 6, ""}
+
+frame pads @
+
+center: vec @((numPads/2 - 1)/2*dX, dY/2)
+frame outline center
+
+/*Pad location measurements*/
+measy pad.corner1 >> pad.corner2
+measy pad.corner2 <- pad.corner1
+
+/*Pad size measurements*/
+measx pad.corner1 -> pad.corner2
+measy pad.corner1 -> pad.corner2
+
+/*Outline measurements*/
+measy edgeOutline.p1 -> edgeOutline.p2
+measx edgeOutline.p1 >> edgeOutline.p1
