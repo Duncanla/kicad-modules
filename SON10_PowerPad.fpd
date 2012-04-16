@@ -1,0 +1,194 @@
+/*
+ * SON10 package with PowerPad from Texas Instruments
+ * 
+ * NOTE: It is recommended to check the size of the thermal pad for your
+ *       specific device datasheet as it may be different than what is given
+ *       here.
+ */
+frame padPaste {
+    set pasteDx = dx*pasteW + dy*pasteL
+    set pasteDy = dx*pasteL + dy*pasteW
+    corner1: vec @(-pasteDx/2, -pasteDy/2)
+    corner2: vec corner1(pasteDx, pasteDy)
+    corner3: vec corner2(-pasteDx, 0mm)
+    
+    rpad " " corner1 corner2 paste
+}
+
+frame pad {
+    orig: vec @(0mm, 0mm)
+    
+    set padDx = dx*padW + dy*padL
+    set padDy = dx*padL + dy*padW
+    corner1: vec @(-padDx/2, -padDy/2)
+    corner2: vec corner1(padDx, padDy)
+    corner3: vec corner2(-padDx, 0mm)
+    
+    set pad = pinNumOffset + n + 1
+    rpad "$pad" corner1 corner2 bare
+    frame padPaste @
+}
+
+frame padArray {
+    loop n = 0, padsPerSide-1
+    set padIndex = n - padsPerSide/2
+    
+    set px = dx*(padIndex+1/2)*pitch
+    set py = dy*(padIndex+1/2)*pitch
+    
+    padOffset: vec @(px, py)
+    frame pad padOffset
+}
+
+frame thermPadPasteSquare {
+    corner1: vec @(-thermPadPasteW/2, -thermPadPasteL/2)
+    corner2: vec corner1(thermPadPasteW, thermPadPasteL)
+    
+    pad " " corner1 corner2 paste
+}
+
+frame thermPadPaste {
+    loop xIndex = 0, thermPadPasteNumW - 1
+    loop yIndex = 0, thermPadPasteNumL - 1
+    
+    set px = -(thermPadPasteNumW-1)/2*thermPadPasteGapW - (thermPadPasteNumW-1)/2*thermPadPasteW + xIndex*(thermPadPasteW + thermPadPasteGapW)
+    set py = -(thermPadPasteNumL-1)/2*thermPadPasteGapL - (thermPadPasteNumL-1)/2*thermPadPasteL + yIndex*(thermPadPasteL + thermPadPasteGapL)
+    //set px = -(thermPadPasteNumW-1)/2/thermPadPasteNumW + xIndex/thermPadPasteNumW
+    //set py = -(thermPadPasteNumL-1)/2/thermPadPasteNumL + yIndex/thermPadPasteNumL
+    pasteOffset: vec @(px, py)
+    frame thermPadPasteSquare pasteOffset
+}
+
+frame thermPadSpur {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-spurW/2, -spurL/2)
+    corner2: vec corner1(spurW, spurL)
+    pad "$pad" corner1 corner2 bare
+}    
+
+frame thermPadSpurs {
+
+    table
+        {px, py}
+        {thermPadW/2+spurW/2, spurDy/2}
+        {thermPadW/2+spurW/2, -spurDy/2}
+        {-thermPadW/2-spurW/2, spurDy/2}
+        {-thermPadW/2-spurW/2, -spurDy/2}    
+
+    padOffset: vec @(px, py)
+    frame thermPadSpur padOffset
+}   
+
+frame thermPadSpurPaste {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-spurPasteW/2, -spurPasteL/2)
+    corner2: vec corner1(spurPasteW, spurPasteL)
+    pad " " corner1 corner2 paste
+}
+
+frame thermPadSpurPastes {
+    table
+        {px, py}
+        {spurPasteOffset+spurPasteW/2, spurDy/2}
+        {spurPasteOffset+spurPasteW/2, -spurDy/2}
+        {-spurPasteOffset-spurPasteW/2, spurDy/2}
+        {-spurPasteOffset-spurPasteW/2, -spurDy/2}
+        
+    pasteOffset: vec @(px, py)
+    frame thermPadSpurPaste pasteOffset          
+}
+
+frame thermPad {
+    corner1: vec @(-thermPadW/2, -thermPadL/2)
+    corner2: vec corner1(thermPadW, thermPadL)
+    set pad = Npads + 1
+    pad "$pad" corner1 corner2 bare
+    frame thermPadPaste @
+
+    set spurW = 0.7mm
+    set spurL = 0.28mm
+    set spurDy = 0.5mm
+    frame thermPadSpurs @
+
+    set spurPasteW = 0.5mm
+    set spurPasteL = 0.26mm
+    set spurPasteOffset = 1.38mm
+    frame thermPadSpurPastes @
+}
+
+frame outerPads {
+    table
+      {dx, dy, pinNumOffset}
+      {1, 0, 0}
+      {-1, 0, padsPerSide}
+    
+    set ax = dy*(width/2 - padL/2)
+    set ay = -dx*(height/2 - padL/2)
+    arrayOrg: vec @(ax, ay)
+    frame padArray arrayOrg
+}
+
+frame pads {
+    frame outerPads @
+    frame thermPad @
+}
+
+frame outline {
+    table
+      {px1, py1, px2, py2}
+      {-outlineW/2, -outlineL/2, -outlineW/2, outlineL/2}
+      {-outlineW/2, outlineL/2, outlineW/2, outlineL/2}
+      {outlineW/2, outlineL/2, outlineW/2, -outlineL/2}
+      {outlineW/2, -outlineL/2, -outlineW/2, -outlineL/2}
+
+    p1: vec @(px1, py1)
+    p2: vec @(px2, py2)
+    line p1 p2 silkW
+}
+
+package "SON10_PowerPad_${Npads}"
+allow overlap
+set Npads = 10
+set padsPerSide = Npads/2
+
+table
+  { width, height, pitch, padW, padL, pasteW, pasteL, thermPadW, thermPadL,
+      thermPadPasteW, thermPadPasteL, thermPadPasteNumW, thermPadPasteNumL,
+      thermPadPasteGapW, thermPadPasteGapL, outlineW, outlineL}
+  { 3.1mm, 3.8mm, 0.5mm, 0.28mm, 0.85mm, 0.23mm, 0.8mm, 2.4mm, 1.65mm, 1.05mm, 0.65mm, 2, 2, 0.22mm, 0.22mm, 4.5mm, 4.5mm }
+  
+set pad1Offset = width/2 - padsPerSide/2*pitch + pitch/2
+frame pads @
+
+set silkW = 6mil
+frame outline @
+
+org: vec @(0mm,0mm)
+
+/* Pad Measurements */
+measx pad.corner1 -> pad.corner2
+measy pad.corner1 -> pad.corner2
+measx thermPad.corner1 -> thermPad.corner2
+measy thermPad.corner1 -> thermPad.corner2
+measx thermPadPasteSquare.corner1 -> thermPadPasteSquare.corner2
+measy thermPadPasteSquare.corner1 -> thermPadPasteSquare.corner2
+measx thermPadPasteSquare.corner2 <- thermPadPasteSquare.corner1
+measy thermPadPasteSquare.corner2 <- thermPadPasteSquare.corner1
+measx padPaste.corner1 -> padPaste.corner2
+measy padPaste.corner1 -> padPaste.corner2
+measx pad.orig -> pad.orig
+
+/* Thermal Pad Spur Measurements */
+measx thermPadSpur.corner1 -> thermPadSpur.corner2
+measy thermPadSpur.corner1 -> thermPadSpur.corner2
+measy thermPadSpur.orig -> thermPadSpur.orig
+measx thermPadSpurPaste.corner1 -> thermPadSpurPaste.corner2
+measy thermPadSpurPaste.corner1 -> thermPadSpurPaste.corner2
+measx thermPadSpurPaste.corner2 -> org
+
+/*Pitch Measurements */
+measx org -> pad.orig
+measy org <- pad.orig
+
+
+

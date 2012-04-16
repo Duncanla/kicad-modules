@@ -1,0 +1,64 @@
+/*
+ * Small-Outline Package
+ * Based on Texas Instruments DCN package (eg. for the TPS62120)
+ */
+
+frame pad {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-padDx/2, -padDy/2)
+    corner2: vec corner1(padDx, padDy)
+    pad "$padNum" corner1 corner2
+}
+
+frame pads {
+    loop xIndex = 0, numPads/2 - 1
+    loop yIndex = 0, 1
+
+    set xOffset = xIndex * dX
+    set yOffset = yIndex * dY
+    set padNum = xIndex * (1-yIndex) + (numPads - xIndex - 1)*yIndex + 1
+    
+    padOffset: vec @(xOffset, yOffset)
+    frame pad padOffset
+}
+
+frame edgeOutline {
+    table
+        {p1x, p1y, p2x, p2y}
+        {outlineW/2, outlineL/2, outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, -outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, outlineW/2, outlineL/2}
+        {-outlineW/2, -outlineL/2, outlineW/2, -outlineL/2}
+
+    p1: vec @(p1x, p1y)
+    p2: vec @(p2x, p2y)
+    line p1 p2 silkW  
+}
+
+frame outline {
+    frame edgeOutline @
+}
+
+package "SOP_${numPads}${variant}"
+
+table
+  {padDx, padDy, dX, dY, outlineW, outlineL, silkW, numPads, variant}
+  {0.45mm, 0.8mm, 0.65mm, 2.7mm, 3.3mm, 4mm, 6mil, 8, ""}
+
+frame pads @
+
+center: vec @((numPads/2 - 1)/2*dX, dY/2)
+frame outline center
+
+/*Pad location measurements*/
+measx pad.orig -> pad.orig
+measy pad.corner2 -> pad.corner1
+measx pad.orig >> pad.orig
+
+/*Pad size measurements*/
+measx pad.corner1 -> pad.corner2
+measy pad.corner1 -> pad.corner2
+
+/*Outline measurements*/
+measy edgeOutline.p1 -> edgeOutline.p2
+measx edgeOutline.p1 >> edgeOutline.p1
