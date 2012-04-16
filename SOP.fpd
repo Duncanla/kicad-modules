@@ -1,6 +1,7 @@
 /*
  * Small-Outline Package
  * Based on Texas Instruments DCN package (eg. for the TPS62120)
+ * Also works with the TI DCK package (eg. TS5A3159A)
  */
 
 frame pad {
@@ -44,6 +45,7 @@ package "SOP_${numPads}${variant}"
 table
   {padDx, padDy, dX, dY, outlineW, outlineL, silkW, numPads, variant}
   {0.45mm, 0.8mm, 0.65mm, 2.7mm, 3.3mm, 4mm, 6mil, 8, ""}
+  {0.40mm, 0.9mm, 0.65mm, 2.2mm, 2.5mm, 3.5mm, 6mil, 6, "_DCK"}
 
 frame pads @
 
@@ -54,6 +56,7 @@ frame outline center
 measx pad.orig -> pad.orig
 measy pad.corner2 -> pad.corner1
 measx pad.orig >> pad.orig
+measy pad.orig >> pad.orig
 
 /*Pad size measurements*/
 measx pad.corner1 -> pad.corner2
