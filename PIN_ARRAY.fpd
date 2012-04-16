@@ -70,6 +70,8 @@ table
   {1, 10, 100mil, 100mil, 60mil, 40mil, 100mil*numRows, numCols*dX, 10mil, ""}
   {1, 8, 100mil, 100mil, 60mil, 40mil, 100mil*numRows, numCols*dX, 10mil, ""}
   {1, 6, 100mil, 100mil, 60mil, 40mil, 100mil*numRows, numCols*dX, 10mil, ""}
+  {1, 16, 100mil, 100mil, 60mil, 40mil, 100mil*numRows, numCols*dX, 10mil, ""}
+  {2, 8, 100mil, 100mil, 60mil, 40mil, 100mil*numRows, numCols*dX, 10mil, ""}
 
 frame pins @
 
