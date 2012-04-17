@@ -1,8 +1,7 @@
 /*
- * Small-Outline Package
+ * Small-Outline Package with PowerPad from Texas Instruments
  * Based on Texas Instruments Packages:
- *                                      DCN (eg. TPS62120)
- *                                      DCK (eg. TS5A3159A)
+ *                                      DDA (eg. OPA454AIDDA)
  */
 
 frame pad {
@@ -24,6 +23,19 @@ frame pads {
     frame pad padOffset
 }
 
+frame thermPad {
+    orig: vec @(0mm, 0mm)
+    traceCorner1: vec @(-thermPadDx/2, -thermPadDy/2)
+    traceCorner2: vec traceCorner1(thermPadDx, thermPadDy)
+    exposedCorner1: vec @(-thermExposedDx/2, -thermExposedDy/2)
+    exposedCorner2: vec exposedCorner1(thermExposedDx, thermExposedDy)
+
+    set padNum = numPads + 1
+    pad "$padNum" traceCorner1 traceCorner2 trace
+    pad "$padNum" exposedCorner1 exposedCorner2
+    
+}
+
 frame edgeOutline {
     table
         {p1x, p1y, p2x, p2y}
@@ -41,17 +53,17 @@ frame outline {
     frame edgeOutline @
 }
 
-package "SOP_${numPads}${variant}"
+package "SOP_${numPads}_PowerPad${variant}"
+allow overlap
 
 table
-  {padDx, padDy, dX, dY, outlineW, outlineL, silkW, numPads, variant}
-  {0.45mm, 0.8mm, 0.65mm, 2.7mm, 3.3mm, 4.0mm, 6mil, 8, "_DCN"}
-  {0.40mm, 0.9mm, 0.65mm, 2.2mm, 2.5mm, 3.5mm, 6mil, 6, "_DCK"}
-  {0.30mm, 0.8mm, 0.50mm, 3.1mm, 2.5mm, 4.5mm, 6mil, 8, "_DCU"} 
-
-frame pads @
+  {padDx, padDy, dX, dY, thermPadDx, thermPadDy, thermExposedDx, thermExposedDy, outlineW, outlineL, silkW, numPads, variant}
+  {0.50mm, 2.2mm, 1.27mm, 5.75mm, 4.89mm, 2.94mm, 3.0mm, 2.49mm, 5.3mm, 8.3mm, 6mil, 8, "_DDA"}
 
 center: vec @((numPads/2 - 1)/2*dX, dY/2)
+
+frame pads @
+frame thermPad center
 frame outline center
 
 /*Pad location measurements*/
@@ -63,6 +75,10 @@ measy pad.orig >> pad.orig
 /*Pad size measurements*/
 measx pad.corner1 -> pad.corner2
 measy pad.corner1 -> pad.corner2
+measx thermPad.traceCorner1 -> thermPad.traceCorner2
+measy thermPad.traceCorner1 -> thermPad.traceCorner2
+measx thermPad.exposedCorner1 -> thermPad.exposedCorner2
+measy thermPad.exposedCorner1 -> thermPad.exposedCorner2
 
 /*Outline measurements*/
 measy edgeOutline.p1 -> edgeOutline.p2
