@@ -1,0 +1,67 @@
+/*
+ * SOT-23 Package
+ * Based on Packages from:
+ *                                      ON Semiconductor (eg. BZX84C12LT1G)
+ */
+
+frame pad {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-padDx/2, -padDy/2)
+    corner2: vec corner1(padDx, padDy)
+    pad "$padNum" corner1 corner2
+}
+
+frame pads {
+    table
+        {padNum, xOffset, yOffset}
+        {1,  0mm, 0mm}
+        {2, dX, 0mm}
+        {3, dX/2, dY}
+
+    padOffset: vec @(xOffset, yOffset)
+    frame pad padOffset
+}
+
+frame edgeOutline {
+    table
+        {p1x, p1y, p2x, p2y}
+        {outlineW/2, outlineL/2, outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, -outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, outlineW/2, outlineL/2}
+        {-outlineW/2, -outlineL/2, outlineW/2, -outlineL/2}
+
+    p1: vec @(p1x, p1y)
+    p2: vec @(p2x, p2y)
+    line p1 p2 silkW  
+}
+
+frame outline {
+    frame edgeOutline @
+}
+
+package "SOT_23${variant}"
+
+table
+  {padDx, padDy, dX, dY, outlineW, outlineL, silkW, variant}
+  {0.8mm, 0.9mm, 1.9mm, 2.0mm, 3.2mm, 3.2mm, 6mil, "_ON"}
+
+frame pads @
+
+center: vec @(dX/2, dY/2)
+frame outline center
+
+/*Pad location measurements*/
+measx pad.orig -> pad.orig
+measy pad.corner2 -> pad.corner1
+measx pad.orig >> pad.orig
+measy pad.orig >> pad.orig
+measx pad.corner1 >> pad.corner2
+measy pad.corner1 >> pad.corner2
+
+/*Pad size measurements*/
+measx pad.corner1 -> pad.corner2
+measy pad.corner1 -> pad.corner2
+
+/*Outline measurements*/
+measy edgeOutline.p1 -> edgeOutline.p2
+measx edgeOutline.p1 >> edgeOutline.p1

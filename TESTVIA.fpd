@@ -1,0 +1,34 @@
+/*
+ * TESTPAD footprints
+ * Bare pad used as a test point
+ */
+
+frame roundPin {
+    orig: vec @(0mm, 0mm)
+    padCorner1: vec @(-padD/2, -padD/2)
+    padCorner2: vec padCorner1(padD, padD)
+    rpad "1" padCorner1 padCorner2 bare
+    
+    holeCorner1: vec @(-holeD/2, -holeD/2)
+    holeCorner2: vec holeCorner1(holeD, holeD)
+    hole holeCorner1 holeCorner2   
+}
+
+
+frame outline {
+    point: vec @(0mm, padD/2+5mil+silkW/2)
+    circ @ point silkW
+}
+
+package "TESTVIA_p${padD}_h${holeD}"
+unit mil
+
+table
+  {padD, holeD, silkW}
+  {30mil,  20mil, 6mil}
+
+frame roundPin @
+frame outline @
+
+/* Measurements */
+measx roundPin.padCorner1 -> roundPin.padCorner2
