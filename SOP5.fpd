@@ -1,6 +1,9 @@
 /*
  * Small-Outline Package (Special case with 5 pins)
- * Based on Texas Instruments DCK package (eg. for the SN74LVC1G08)
+ * Based on Texas Insturments Packages: 
+ *                                      DCK (eg. SN74LVC1G08)
+ *                                      DDC (eg. TPS79901)
+ *                                      DBV (eg. TPS72325)
  */
 
 frame pad {
@@ -49,7 +52,8 @@ package "SOP_${numPads}${variant}"
 table
   {padDx, padDy, dX, dY, outlineW, outlineL, silkW, numPads, variant}
   {0.40mm, 0.9mm, 0.65mm, 2.2mm, 2.5mm, 3.5mm, 6mil, 5, "_DCK"}
-
+  {0.65mm, 1.2mm, 0.95mm, 2.55mm, 3.25mm, dY+padDy+0.4mm, 6mil, 5, "_DDC"}
+  {0.6mm, 1.05mm, 0.95mm, 2.7mm, 3.25mm, dY+padDy+0.4mm, 6mil, 5, "_DBV"}
 frame pads @
 
 center: vec @(dX, dY/2)
