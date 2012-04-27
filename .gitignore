@@ -1,3 +1,5 @@
-
 # Backup Files #
 *~
+
+# Compiled libraries #
+*.mod

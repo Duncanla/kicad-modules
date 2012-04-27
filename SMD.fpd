@@ -1,0 +1,67 @@
+/*
+ * Basic SMD packages
+ */
+
+frame pad {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-padDx/2, -padDy/2)
+    corner2: vec corner1(padDx, padDy)
+    pad "$padNum" corner1 corner2
+}
+
+frame pads {
+    loop yIndex = 0, 1
+
+    set yOffset = yIndex * dY
+    set padNum = yIndex + 1
+    
+    padOffset: vec @(0mm, yOffset)
+    frame pad padOffset
+}
+
+frame edgeOutline {
+    table
+        {p1x, p1y, p2x, p2y}
+        {outlineW/2, outlineL/2, outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, -outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, outlineW/2, outlineL/2}
+        {-outlineW/2, -outlineL/2, outlineW/2, -outlineL/2}
+
+    p1: vec @(p1x, p1y)
+    p2: vec @(p2x, p2y)
+    line p1 p2 silkW  
+}
+
+frame outline {
+    frame edgeOutline @
+}
+
+package "${name}"
+
+table
+  {dY, padDx, padDy, outlineW, outlineL, silkW, name}
+  {0.9mm, 0.6mm, 0.5mm, 0.9mm, 1.7mm, 6mil, "LED_0402"}
+  {2.3mm, 2.5mm, 1.0mm, 2.8mm, 3.6mm, 6mil, "1008"}
+  {2.0mm, 2.0mm, 0.85mm, 2.3mm, 3.2mm, 6mil, "0806"}
+
+
+frame pads @
+
+center: vec @(0mm, dY/2)
+frame outline center
+
+/*Pad location measurements*/
+measx pad.orig -> pad.orig
+measy pad.corner2 -> pad.corner1
+measx pad.orig >> pad.orig
+measy pad.orig >> pad.orig
+measx pad.corner1 >> pad.corner2
+measy pad.corner1 >> pad.corner2
+
+/*Pad size measurements*/
+measx pad.corner1 -> pad.corner2
+measy pad.corner1 -> pad.corner2
+
+/*Outline measurements*/
+measy edgeOutline.p1 -> edgeOutline.p2
+measx edgeOutline.p1 >> edgeOutline.p1
