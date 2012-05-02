@@ -7,18 +7,7 @@ frame roundPin {
     orig: vec @(0mm, 0mm)
     padCorner1: vec @(-padR, -padR)
     padCorner2: vec padCorner1(2*padR, 2*padR)
-    rpad "$pinNum" padCorner1 padCorner2
-    
-    holeCorner1: vec @(-holeR, -holeR)
-    holeCorner2: vec holeCorner1(2*holeR, 2*holeR)
-    hole holeCorner1 holeCorner2   
-}
-
-frame squarePin {
-    orig: vec @(0mm, 0mm)
-    padCorner1: vec @(-padR, -padR)
-    padCorner2: vec padCorner1(2*padR, 2*padR)
-    pad "$pinNum" padCorner1 padCorner2
+    rpad "$pinNum$pinLetter" padCorner1 padCorner2
     
     holeCorner1: vec @(-holeR, -holeR)
     holeCorner2: vec holeCorner1(2*holeR, 2*holeR)
@@ -26,26 +15,28 @@ frame squarePin {
 }
 
 frame padArray {
-    loop n = 0, arrayNumPins - 1
-    
-    set px = n*dX
-    set py = 0mm
-    
-    pinOffset: vec @(px, py)
-
-    frame roundPin pinOffset
+ 
 }
 
 frame padMatrix {
     orig: vec @(0mm, 0mm)
     center: vec @((numCols-1)*dX/2, (numRows-1)*dY/2)
 
-    loop row = 1, numRows
-    set arrayNumPins = numCols
-    
-    arrayOffset: vec @(0mil, (row-1)*dY)
-    set pinNumOffset = row*numCols
-    frame padArray arrayOffset
+    table
+        { row, n, pinLetter }
+        { 1, 0, "A" }
+        { 1, 1, "B" }
+        { 2, 0, "C" }
+        { 2, 1, "D" }
+        { 3, 0, "E" }
+        { 3, 1, "F" }
+     
+    set px = n*dX
+    set py = row*dY
+
+    pinOffset: vec @(px, py)
+
+    frame roundPin pinOffset
 }
       
 frame pins {
