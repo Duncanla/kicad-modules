@@ -2,6 +2,8 @@
  * SOT-23 Package
  * Based on Packages from:
  *                                      ON Semiconductor (eg. BZX84C12LT1G)
+ * And Texas Instruments packages:
+ *                                      DBV (eg. TPS3809K33DBV)
  */
 
 frame pad {
@@ -44,6 +46,7 @@ package "SOT_23${variant}"
 table
   {padDx, padDy, dX, dY, outlineW, outlineL, silkW, variant}
   {0.8mm, 0.9mm, 1.9mm, 2.0mm, 3.2mm, 3.2mm, 6mil, "_ON"}
+  {0.8mm, 1.15mm, 1.9mm, 2.4mm, 3.2mm, 3.7mm, 6mil, "_DBV"}
 
 frame pads @
 
