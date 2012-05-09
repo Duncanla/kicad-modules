@@ -51,6 +51,10 @@ frame mntHole {
     corner1: vec center(-1.19mm/2, -1.19mm/2)
     corner2: vec corner1(1.19mm, 1.19mm)
     hole corner1 corner2
+
+    plateCorner1: vec corner1(-8mil, -8mil)
+    plateCorner2: vec corner2(8mil, 8mil)
+    rpad "" plateCorner1 plateCorner2
 }
 
 frame mntHoles {
