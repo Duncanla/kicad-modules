@@ -4,7 +4,8 @@
  *                                      DCN (eg. TPS62120)
  *                                      DCK (eg. TS5A3159A)
  * VISHAY Packages:
- *                                      SO-8 (eg. SI4446DY-TI-E3)
+ *                                      SO-8 (eg. SI4446DY-T1-E3)
+ *                                      TSSOP-8 (eg SI6943BDQ-T1-E3)
  */
 
 frame pad {
@@ -43,14 +44,15 @@ frame outline {
     frame edgeOutline @
 }
 
-package "SOP_${numPads}${variant}"
+package "${prefix}_${numPads}${variant}"
 
 table
-  {padDx, padDy, dX, dY, outlineW, outlineL, silkW, numPads, variant}
-  {0.45mm, 0.8mm, 0.65mm, 2.7mm, 3.3mm, 4.0mm, 6mil, 8, "_DCN"}
-  {0.40mm, 0.9mm, 0.65mm, 2.2mm, 2.5mm, 3.5mm, 6mil, 6, "_DCK"}
-  {0.30mm, 0.8mm, 0.50mm, 3.1mm, 2.5mm, 4.5mm, 6mil, 8, "_DCU"}
-  {22mil, 47mil, 50mil, 199mil, 225mil, 275mil, 6mil, 8, "_VISHAY"}
+  {padDx, padDy, dX, dY, outlineW, outlineL, silkW, numPads, prefix, variant}
+  {0.45mm, 0.8mm, 0.65mm, 2.7mm, 3.3mm, 4.0mm, 6mil, 8, "SOP", "_DCN"}
+  {0.40mm, 0.9mm, 0.65mm, 2.2mm, 2.5mm, 3.5mm, 6mil, 6, "SOP", "_DCK"}
+  {0.30mm, 0.8mm, 0.50mm, 3.1mm, 2.5mm, 4.5mm, 6mil, 8, "SOP", "_DCU"}
+  {22mil, 47mil, 50mil, 199mil, 225mil, 275mil, 6mil, 8, "SOP", "_VISHAY"}
+  {14mil, 40mil, 26mil, 222mil, 3.3mm, 7mm, 6mil, 8, "TSSOP", "_VISHAY"}
 
 frame pads @
 
