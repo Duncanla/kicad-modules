@@ -3,6 +3,7 @@
  * Based on Texas Instruments Packages:
  *                                      DCN (eg. TPS62120)
  *                                      DCK (eg. TS5A3159A)
+ *                                      D   (eg. THS3021)
  * VISHAY Packages:
  *                                      SO-8 (eg. SI4446DY-T1-E3)
  *                                      TSSOP-8 (eg SI6943BDQ-T1-E3)
@@ -53,6 +54,7 @@ table
   {0.30mm, 0.8mm, 0.50mm, 3.1mm, 2.5mm, 4.5mm, 6mil, 8, "SOP", "_DCU"}
   {22mil, 47mil, 50mil, 199mil, 225mil, 275mil, 6mil, 8, "SOP", "_VISHAY"}
   {14mil, 40mil, 26mil, 222mil, 3.3mm, 7mm, 6mil, 8, "TSSOP", "_VISHAY"}
+  {0.6mm, 2.0mm, 1.27mm, 4.8mm, 5.2mm, 7.2mm, 6mil, 8, "SOIC", "_D"}
 
 frame pads @
 
