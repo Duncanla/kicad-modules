@@ -1,0 +1,139 @@
+/*
+ * Small-Outline Package
+ * Based on Texas Instruments Packages:
+ *                                      DCN (eg. TPS62120)
+ *                                      DCK (eg. TS5A3159A)
+ *                                      D   (eg. THS3021)
+ * VISHAY Packages:
+ *                                      SO-8 (eg. SI4446DY-T1-E3)
+ *                                      TSSOP-8 (eg SI6943BDQ-T1-E3)
+ */
+
+frame pad {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-padDx/2, -padDy/2)
+    corner2: vec corner1(padDx, padDy)
+    pad "$padNum" corner1 corner2
+}
+
+frame pads {
+    table
+        {startPin, numPins, rowOffset, yOffset}
+        {1, (numPads+1)/2, 0mil, 0mil}
+        {2, numPads/2, dX, dY*pin1Side}
+
+    loop pinIndex = 0, numPins-1
+
+    set xOffset = rowOffset + pinIndex*dX*2
+    set padNum = startPin + pinIndex*2
+    
+    padOffset: vec @(xOffset, yOffset)
+    frame pad padOffset
+
+}
+
+frame interPadOutline {
+
+    table
+        {startPin, numPins, rowOffset, silkSide}
+        {1, (numPads+1)/2, 0mil, 1}
+        {2, numPads/2, dX, -1}
+
+    loop pinIndex = 1, numPins-2
+
+    set xOffset = rowOffset + pinIndex*dX*2
+    
+    set yCenter = dY/2*pin1Side
+    set silkY = yCenter - outlineL/2*pin1Side*silkSide
+    silkP1: vec @(xOffset-dX, silkY)
+    silkP2: vec @(xOffset-padDx/2-silkSpace, silkY)
+    line silkP1 silkP2 silkW
+    silkP3: vec @(xOffset+dX, silkY)
+    silkP4: vec @(xOffset+padDx/2+silkSpace, silkY)
+    line silkP3 silkP4 silkW
+
+}
+
+frame endPadOutline {
+
+    table
+        {startPin, numPins, rowOffset, silkSide}
+        {1, (numPads+oddPads)/2, 0mil, 1}
+        {2, (numPads-oddPads)/2, dX, -1}
+
+
+    set leftXOffset = rowOffset
+    set rightXOffset = rowOffset + (numPins-1)*dX*2
+
+    set yCenter = dY/2*pin1Side
+    set silkY = yCenter - outlineL/2*pin1Side*silkSide
+
+    set xCenter = (numPads-1)/2*dX
+    set leftOutlineX = xCenter - outlineW/2
+    set rightOutlineX = xCenter + outlineW/2
+
+    leftP1: vec @(leftOutlineX, silkY)
+    leftP2: vec @(leftXOffset-padDx/2-silkSpace, silkY)
+    line leftP1 leftP2 silkW 
+
+    leftP3: vec @(leftXOffset+padDx/2+silkSpace, silkY)
+    leftP4: vec @(leftXOffset+dY/2, silkY)
+    line leftP3 leftP4 silkW
+
+    rightP1: vec @(rightOutlineX, silkY)
+    rightP2: vec @(rightXOffset+padDx/2+silkSpace, silkY)
+    line rightP1 rightP2 silkW
+
+    rightP3: vec @(rightXOffset-padDx/2-silkSpace, silkY)
+    rightP4: vec @(rightXOffset-dY/2, silkY)
+    line rightP3 rightP4 silkW
+
+}
+
+
+
+frame edgeOutline {
+    table
+        {p1x, p1y, p2x, p2y}
+        {outlineW/2, outlineL/2, outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, -outlineW/2, -outlineL/2}
+
+    p1: vec @(p1x, p1y)
+    p2: vec @(p2x, p2y)
+    line p1 p2 silkW  
+}
+
+frame outline {
+    center: vec @((numPads - 1)/2*dX, dY/2*pin1Side)
+    frame edgeOutline center
+    frame interPadOutline @ 
+    frame endPadOutline @
+}
+
+package "HEADER_SMD_${numPads}${variant}"
+unit mil
+
+/* pin1Side: 1 for bottom, -1 for top */
+/* oddPads: 1 for odd number of pads, 0 for even number of pads */
+table
+  {padDx, padDy, dX, dY, pin1Side, outlineW, outlineL, silkW, silkSpace, numPads, oddPads, variant}
+  {28mil, 89mil, 50mil, 110mil, -1, 180mil, 90mil, 6mil, 6mil, 3, 1, "_PIN1TOP"}
+
+frame pads @
+frame outline @
+
+/*Pad location measurements*/
+measx pad.orig -> pad.orig
+measy pad.corner2 -> pad.corner1
+measx pad.orig >> pad.orig
+measy pad.orig >> pad.orig
+measx pad.corner1 >> pad.corner2
+measy pad.corner1 >> pad.corner2
+
+/*Pad size measurements*/
+measx pad.corner1 -> pad.corner2
+measy pad.corner1 -> pad.corner2
+
+/*Outline measurements*/
+measy edgeOutline.p1 -> edgeOutline.p2
+measx edgeOutline.p1 >> edgeOutline.p1
