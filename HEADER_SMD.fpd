@@ -1,0 +1,128 @@
+/*
+ * 2-row SMD Headers
+ */
+
+frame pad {
+    orig: vec @(0mm, 0mm)
+    corner1: vec @(-padDx/2, -padDy/2)
+    corner2: vec corner1(padDx, padDy)
+    pad "$padNum" corner1 corner2
+}
+
+frame pads {
+    loop xIndex = 0, numPads/2 - 1
+    loop yIndex = 0, 1
+
+    set xOffset = xIndex * dX
+    set yOffset = yIndex * dY
+    set padNum = 1 + xIndex * 2 + yIndex
+    
+    padOffset: vec @(xOffset, yOffset)
+    frame pad padOffset
+}
+frame interPadOutline {
+
+    table
+        {startPin, numPins, rowOffset, silkSide}
+        {1, numPads/2, 0mil, 1}
+        {2, numPads/2, dX, -1}
+
+    loop pinIndex = 1, numPins-2
+
+    set xOffset = rowOffset + pinIndex*dX
+    
+    set yCenter = dY/2
+    set silkY = yCenter - outlineL/2*silkSide
+    silkP1: vec @(xOffset-dX, silkY)
+    silkP2: vec @(xOffset-padDx/2-silkSpace, silkY)
+    line silkP1 silkP2 silkW
+    silkP3: vec @(xOffset+dX, silkY)
+    silkP4: vec @(xOffset+padDx/2+silkSpace, silkY)
+    line silkP3 silkP4 silkW
+
+}
+
+frame endPadOutline {
+
+    table
+        {startPin, numPins, silkSide}
+        {1, numPads/2, 1}
+        {2, numPads/2, -1}
+
+
+    set leftXOffset = 0mil
+    set rightXOffset = 0mil + (numPins-1)*dX
+
+    set yCenter = dY/2
+    set silkY = yCenter - outlineL/2*silkSide
+
+    set xCenter = (numPads/2-1)/2*dX
+    set leftOutlineX = xCenter - outlineW/2
+    set rightOutlineX = xCenter + outlineW/2
+
+    leftP1: vec @(leftOutlineX, silkY)
+    leftP2: vec @(leftXOffset-padDx/2-silkSpace, silkY)
+    line leftP1 leftP2 silkW 
+
+    leftP3: vec @(leftXOffset+padDx/2+silkSpace, silkY)
+    leftP4: vec @(leftXOffset+dX/2, silkY)
+    line leftP3 leftP4 silkW
+
+    rightP1: vec @(rightOutlineX, silkY)
+    rightP2: vec @(rightXOffset+padDx/2+silkSpace, silkY)
+    line rightP1 rightP2 silkW
+
+    rightP3: vec @(rightXOffset-padDx/2-silkSpace, silkY)
+    rightP4: vec @(rightXOffset-dX/2, silkY)
+    line rightP3 rightP4 silkW
+
+}
+
+
+
+frame edgeOutline {
+    table
+        {p1x, p1y, p2x, p2y}
+        {outlineW/2, outlineL/2, outlineW/2, -outlineL/2}
+        {-outlineW/2, outlineL/2, -outlineW/2, -outlineL/2}
+
+    p1: vec @(p1x, p1y)
+    p2: vec @(p2x, p2y)
+    line p1 p2 silkW  
+}
+
+frame outline {
+    center: vec @((numPads/2 - 1)/2*dX, dY/2)
+    frame edgeOutline center
+    frame interPadOutline @ 
+    frame endPadOutline @
+}
+
+package "HEADER_SMD_2x${numCols}${variant}"
+
+table
+  {padDx, padDy, dX, dY, outlineW, outlineL, silkW, silkSpace, numPads, variant}
+  {1.27mm, 2.54mm, 2.54mm, 5.46mm, 4.9mm, 5.1mm, 6mil, 6mil, 4, ""}
+  {1.27mm, 2.54mm, 2.54mm, 5.46mm, 4.9mm, 5.1mm, 6mil, 6mil, 6, ""}
+
+set numCols = numPads/2
+
+frame pads @
+
+frame outline @
+
+/*Pad location measurements*/
+measx pad.orig -> pad.orig
+measy pad.corner2 -> pad.corner1
+measx pad.orig >> pad.orig
+measy pad.orig >> pad.orig
+measx pad.corner1 >> pad.corner2
+measy pad.corner1 >> pad.corner2
+
+/*Pad size measurements*/
+measx pad.corner1 -> pad.corner2
+measy pad.corner1 -> pad.corner2
+
+/*Outline measurements*/
+measy edgeOutline.p1 -> edgeOutline.p2
+measx edgeOutline.p1 >> edgeOutline.p1
