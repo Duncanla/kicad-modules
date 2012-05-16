@@ -2,6 +2,7 @@
  * Small-Outline Package with PowerPad from Texas Instruments
  * Based on Texas Instruments Packages:
  *                                      DDA (eg. OPA454AIDDA)
+ *                                      DGN (eg. THS3201)
  */
 
 frame pad {
@@ -59,6 +60,7 @@ allow overlap
 table
   {padDx, padDy, dX, dY, thermPadDx, thermPadDy, thermExposedDx, thermExposedDy, outlineW, outlineL, silkW, numPads, variant}
   {0.50mm, 2.2mm, 1.27mm, 5.75mm, 4.89mm, 2.94mm, 3.0mm, 2.49mm, 5.3mm, 8.3mm, 6mil, 8, "_DDA"}
+  {0.40mm, 1.60mm, 0.65mm, 4.2mm, 1.89mm, 1.57mm, 1.89mm, 1.57mm, 3.2mm, 6.1mm, 6mil, 8, "_DGN"}
 
 center: vec @((numPads/2 - 1)/2*dX, dY/2)
 
